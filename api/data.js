@@ -36,11 +36,19 @@ export default async function handler(request, response) {
       const { blobs } = await list({ token });
       console.log('Blobs list:', blobs);
 
-      const cyclesBlob = blobs.find(blob => blob.pathname === 'cycles.json');
-      if (cyclesBlob) {
-        console.log('Cycles blob found:', cyclesBlob);
+      // Filter blobs to only include those with the correct pathname
+      const cyclesBlobs = blobs.filter(blob => blob.pathname === 'cycles.json');
+      console.log('Filtered cycles blobs:', cyclesBlobs);
 
-        const fetchResponse = await fetch(cyclesBlob.url);
+      if (cyclesBlobs.length > 0) {
+        // Find the most recent blob by uploadedAt
+        const latestBlob = cyclesBlobs.reduce((latest, blob) => {
+          return new Date(latest.uploadedAt) > new Date(blob.uploadedAt) ? latest : blob;
+        });
+
+        console.log('Latest cycles blob:', latestBlob);
+
+        const fetchResponse = await fetch(latestBlob.url);
         if (!fetchResponse.ok) {
           throw new Error(`Failed to fetch data: ${fetchResponse.status} ${fetchResponse.statusText}`);
         }
