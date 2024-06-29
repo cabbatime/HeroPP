@@ -4,7 +4,7 @@ import styles from './App.module.css';
 function App() {
   const [cycles, setCycles] = useState([]);
   const [newCycle, setNewCycle] = useState({ name: '', startDate: '', endDate: '', goal: '' });
-  const [newIdea, setNewIdea] = useState({ title: '', description: '' });
+  const [newIdea, setNewIdea] = useState({ title: '', description: '', cycleIndex: null });
   const [expandedCycleIndex, setExpandedCycleIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -68,13 +68,26 @@ function App() {
       updatedCycles[cycleIndex].ideas.push({ ...newIdea, votes: 0, comments: [] });
       saveData({ cycles: updatedCycles });
       setCycles(updatedCycles);
-      setNewIdea({ title: '', description: '' });
+      setNewIdea({ title: '', description: '', cycleIndex: null });
     }
   };
 
   const voteIdea = (cycleIndex, ideaIndex) => {
     const updatedCycles = [...cycles];
     updatedCycles[cycleIndex].ideas[ideaIndex].votes += 1;
+    saveData({ cycles: updatedCycles });
+    setCycles(updatedCycles);
+  };
+
+  const deleteCycle = (cycleIndex) => {
+    const updatedCycles = cycles.filter((_, index) => index !== cycleIndex);
+    saveData({ cycles: updatedCycles });
+    setCycles(updatedCycles);
+  };
+
+  const deleteIdea = (cycleIndex, ideaIndex) => {
+    const updatedCycles = [...cycles];
+    updatedCycles[cycleIndex].ideas = updatedCycles[cycleIndex].ideas.filter((_, index) => index !== ideaIndex);
     saveData({ cycles: updatedCycles });
     setCycles(updatedCycles);
   };
@@ -110,6 +123,7 @@ function App() {
                 <button className={styles.expandButton}>
                   {expandedCycleIndex === cycleIndex ? '▲' : '▼'}
                 </button>
+                <button onClick={() => deleteCycle(cycleIndex)} className={styles.deleteButton}>Delete</button>
               </div>
               {expandedCycleIndex === cycleIndex && (
                 <div className={styles.cycleContent}>
@@ -125,6 +139,7 @@ function App() {
                         <button className={styles.voteButton} onClick={() => voteIdea(cycleIndex, ideaIndex)}>
                           Vote
                         </button>
+                        <button onClick={() => deleteIdea(cycleIndex, ideaIndex)} className={styles.deleteButton}>Delete</button>
                       </div>
                     ))}
                   </div>
@@ -147,6 +162,34 @@ function App() {
               )}
             </div>
           ))}
+        </div>
+        <div className={styles.sidebar}>
+          <h3>Suggest an idea</h3>
+          <textarea
+            className={styles.input}
+            placeholder="Write your suggestion here..."
+            value={newIdea.description}
+            onChange={(e) => setNewIdea({ ...newIdea, description: e.target.value })}
+          />
+          <input
+            className={styles.input}
+            placeholder="Idea Title"
+            value={newIdea.title}
+            onChange={(e) => setNewIdea({ ...newIdea, title: e.target.value })}
+          />
+          <select
+            className={styles.input}
+            value={newIdea.cycleIndex}
+            onChange={(e) => setNewIdea({ ...newIdea, cycleIndex: e.target.value })}
+          >
+            <option value={null}>Select Cycle</option>
+            {cycles.map((cycle, index) => (
+              <option key={cycle.name} value={index}>{cycle.name}</option>
+            ))}
+          </select>
+          <button className={styles.submitButton} onClick={() => newIdea.cycleIndex !== null && addIdea(newIdea.cycleIndex)}>
+            Submit
+          </button>
         </div>
       </main>
 

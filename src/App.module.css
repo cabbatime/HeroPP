@@ -1,6 +1,9 @@
 .app {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   color: #333;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 .header {
@@ -30,11 +33,15 @@
 }
 
 .main {
+  display: flex;
   padding: 20px;
   background-color: #f4f5f7;
+  flex: 1;
+  gap: 20px;
 }
 
 .cycleList {
+  flex: 2;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -64,6 +71,13 @@
   border: none;
   cursor: pointer;
   font-size: 18px;
+}
+
+.deleteButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: red;
 }
 
 .ideaList {
@@ -160,4 +174,12 @@
   padding: 10px 15px;
   border-radius: 3px;
   cursor: pointer;
+}
+
+.sidebar {
+  flex: 1;
+  background-color: #fff;
+  border: 1px solid #dfe1e6;
+  border-radius: 3px;
+  padding: 15px;
 }
