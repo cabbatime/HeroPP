@@ -91,6 +91,13 @@ function App() {
     setCycles(updatedCycles);
   };
 
+  const handleDescriptionChange = (e) => {
+    const wordCount = e.target.value.split(' ').filter(Boolean).length;
+    if (wordCount <= 250) {
+      setNewIdea({ ...newIdea, description: e.target.value });
+    }
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -149,7 +156,7 @@ function App() {
                       className="w-full p-2 border border-gray-300 rounded"
                       placeholder="Idea Description"
                       value={newIdea.description}
-                      onChange={(e) => setNewIdea({ ...newIdea, description: e.target.value })}
+                      onChange={handleDescriptionChange}
                     />
                     <button className="bg-blue-600 text-white py-2 px-4 rounded" onClick={() => addIdea(cycleIndex)}>Add Idea</button>
                   </div>
@@ -160,17 +167,17 @@ function App() {
         </div>
         <div className="w-64 bg-white border border-gray-300 rounded p-4 ml-4">
           <h3 className="font-semibold mb-2">Suggest an idea</h3>
-          <textarea
-            className="w-full p-2 border border-gray-300 rounded mb-2"
-            placeholder="Write your suggestion here..."
-            value={newIdea.description}
-            onChange={(e) => setNewIdea({ ...newIdea, description: e.target.value })}
-          />
           <input
             className="w-full p-2 border border-gray-300 rounded mb-2"
             placeholder="Idea Title"
             value={newIdea.title}
             onChange={(e) => setNewIdea({ ...newIdea, title: e.target.value })}
+          />
+          <textarea
+            className="w-full p-2 border border-gray-300 rounded mb-2"
+            placeholder="Write your suggestion here..."
+            value={newIdea.description}
+            onChange={handleDescriptionChange}
           />
           <select
             className="w-full p-2 border border-gray-300 rounded mb-2"
