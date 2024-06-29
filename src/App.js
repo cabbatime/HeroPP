@@ -6,6 +6,10 @@ function App() {
   const [newIdea, setNewIdea] = useState({ title: '', description: '', cycleIndex: null });
   const [expandedCycleIndex, setExpandedCycleIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditCycleModalOpen, setIsEditCycleModalOpen] = useState(false);
+  const [isEditIdeaModalOpen, setIsEditIdeaModalOpen] = useState(false);
+  const [cycleToEdit, setCycleToEdit] = useState(null);
+  const [ideaToEdit, setIdeaToEdit] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -98,6 +102,32 @@ function App() {
     }
   };
 
+  const openEditCycleModal = (cycleIndex) => {
+    setCycleToEdit({ ...cycles[cycleIndex], index: cycleIndex });
+    setIsEditCycleModalOpen(true);
+  };
+
+  const openEditIdeaModal = (cycleIndex, ideaIndex) => {
+    setIdeaToEdit({ ...cycles[cycleIndex].ideas[ideaIndex], cycleIndex, index: ideaIndex });
+    setIsEditIdeaModalOpen(true);
+  };
+
+  const saveEditedCycle = () => {
+    const updatedCycles = [...cycles];
+    updatedCycles[cycleToEdit.index] = { ...cycleToEdit };
+    saveData({ cycles: updatedCycles });
+    setCycles(updatedCycles);
+    setIsEditCycleModalOpen(false);
+  };
+
+  const saveEditedIdea = () => {
+    const updatedCycles = [...cycles];
+    updatedCycles[ideaToEdit.cycleIndex].ideas[ideaToEdit.index] = { ...ideaToEdit };
+    saveData({ cycles: updatedCycles });
+    setCycles(updatedCycles);
+    setIsEditIdeaModalOpen(false);
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -109,7 +139,7 @@ function App() {
   return (
     <div className="font-sans text-gray-900 min-h-screen flex flex-col">
       <header className="bg-white border-b border-gray-300 p-4 flex justify-between items-center shadow-md">
-        <span className="font-bold text-blue-600 text-lg">Cycle Management App</span>
+        <span className="font-bold text-blue-600 text-lg">Hero PP</span>
         <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500" onClick={() => setIsModalOpen(true)}>Create New Cycle</button>
       </header>
 
@@ -124,8 +154,25 @@ function App() {
                 <h3 className="font-semibold">{cycle.name}</h3>
                 <span>{cycle.startDate} - {cycle.endDate}</span>
                 <span>Goal: {cycle.goal}</span>
-                <button className="text-xl">&#x25BC;</button>
-                <button onClick={() => deleteCycle(cycleIndex)} className="text-red-600 hover:text-red-400">Delete</button>
+                <div className="relative">
+                  <button className="text-xl" onClick={(e) => e.stopPropagation()}>
+                    &#x22EE;
+                  </button>
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
+                    <button 
+                      onClick={() => { openEditCycleModal(cycleIndex); }} 
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      onClick={() => deleteCycle(cycleIndex)} 
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
               </div>
               {expandedCycleIndex === cycleIndex && (
                 <div className="p-4 border-t border-gray-300">
@@ -141,7 +188,25 @@ function App() {
                         <button className="bg-blue-600 text-white py-1 px-3 rounded hover:bg-blue-500" onClick={() => voteIdea(cycleIndex, ideaIndex)}>
                           Vote
                         </button>
-                        <button onClick={() => deleteIdea(cycleIndex, ideaIndex)} className="text-red-600 hover:text-red-400 ml-2">Delete</button>
+                        <div className="relative">
+                          <button className="text-xl ml-2" onClick={(e) => e.stopPropagation()}>
+                            &#x22EE;
+                          </button>
+                          <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
+                            <button 
+                              onClick={() => { openEditIdeaModal(cycleIndex, ideaIndex); }} 
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                              Edit
+                            </button>
+                            <button 
+                              onClick={() => deleteIdea(cycleIndex, ideaIndex)} 
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -213,6 +278,68 @@ function App() {
             <div className="flex justify-between">
               <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500" onClick={addCycle}>Add Cycle</button>
               <button className="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-200" onClick={() => setIsModalOpen(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isEditCycleModalOpen && (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow-lg w-96">
+            <h2 className="text-xl font-semibold mb-4">Edit Cycle</h2>
+            <input
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+              placeholder="Cycle Name"
+              value={cycleToEdit.name}
+              onChange={(e) => setCycleToEdit({ ...cycleToEdit, name: e.target.value })}
+            />
+            <input
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+              type="date"
+              placeholder="Start Date"
+              value={cycleToEdit.startDate}
+              onChange={(e) => setCycleToEdit({ ...cycleToEdit, startDate: e.target.value })}
+            />
+            <input
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+              type="date"
+              placeholder="End Date"
+              value={cycleToEdit.endDate}
+              onChange={(e) => setCycleToEdit({ ...cycleToEdit, endDate: e.target.value })}
+            />
+            <input
+              className="w-full p-2 border border-gray-300 rounded mb-4"
+              placeholder="Cycle Goal"
+              value={cycleToEdit.goal}
+              onChange={(e) => setCycleToEdit({ ...cycleToEdit, goal: e.target.value })}
+            />
+            <div className="flex justify-between">
+              <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500" onClick={saveEditedCycle}>Save Changes</button>
+              <button className="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-200" onClick={() => setIsEditCycleModalOpen(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isEditIdeaModalOpen && (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow-lg w-96">
+            <h2 className="text-xl font-semibold mb-4">Edit Idea</h2>
+            <input
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+              placeholder="Idea Title"
+              value={ideaToEdit.title}
+              onChange={(e) => setIdeaToEdit({ ...ideaToEdit, title: e.target.value })}
+            />
+            <textarea
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+              placeholder="Idea Description"
+              value={ideaToEdit.description}
+              onChange={(e) => setIdeaToEdit({ ...ideaToEdit, description: e.target.value })}
+            />
+            <div className="flex justify-between">
+              <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500" onClick={saveEditedIdea}>Save Changes</button>
+              <button className="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-200" onClick={() => setIsEditIdeaModalOpen(false)}>Cancel</button>
             </div>
           </div>
         </div>
