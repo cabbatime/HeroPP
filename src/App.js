@@ -33,17 +33,23 @@ function App() {
 
   const saveData = async () => {
     try {
-      await fetch('/api/data', {
+      const response = await fetch('/api/data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ cycles }),
       });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      console.log('Save result:', result);
     } catch (error) {
       console.error('Error saving data:', error);
     }
   };
+
 
   const addCycle = () => {
     if (newCycle.name && newCycle.startDate && newCycle.endDate && newCycle.goal) {
