@@ -12,6 +12,8 @@ function App() {
   const [ideaToEdit, setIdeaToEdit] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [openCycleMenuIndex, setOpenCycleMenuIndex] = useState(null);
+  const [openIdeaMenuIndex, setOpenIdeaMenuIndex] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -128,6 +130,14 @@ function App() {
     setIsEditIdeaModalOpen(false);
   };
 
+  const toggleCycleMenu = (index) => {
+    setOpenCycleMenuIndex(openCycleMenuIndex === index ? null : index);
+  };
+
+  const toggleIdeaMenu = (index) => {
+    setOpenIdeaMenuIndex(openIdeaMenuIndex === index ? null : index);
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -139,7 +149,7 @@ function App() {
   return (
     <div className="font-sans text-gray-900 min-h-screen flex flex-col">
       <header className="bg-white border-b border-gray-300 p-4 flex justify-between items-center shadow-md">
-        <span className="font-bold text-blue-600 text-lg">Hero PP</span>
+        <span className="font-bold text-blue-600 text-lg">Cycle Management App</span>
         <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500" onClick={() => setIsModalOpen(true)}>Create New Cycle</button>
       </header>
 
@@ -155,23 +165,25 @@ function App() {
                 <span>{cycle.startDate} - {cycle.endDate}</span>
                 <span>Goal: {cycle.goal}</span>
                 <div className="relative">
-                  <button className="text-xl" onClick={(e) => e.stopPropagation()}>
+                  <button className="text-xl" onClick={(e) => { e.stopPropagation(); toggleCycleMenu(cycleIndex); }}>
                     &#x22EE;
                   </button>
-                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
-                    <button 
-                      onClick={() => { openEditCycleModal(cycleIndex); }} 
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => deleteCycle(cycleIndex)} 
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Delete
-                    </button>
-                  </div>
+                  {openCycleMenuIndex === cycleIndex && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
+                      <button 
+                        onClick={() => { openEditCycleModal(cycleIndex); setOpenCycleMenuIndex(null); }} 
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        onClick={() => { deleteCycle(cycleIndex); setOpenCycleMenuIndex(null); }} 
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
               {expandedCycleIndex === cycleIndex && (
@@ -189,23 +201,25 @@ function App() {
                           Vote
                         </button>
                         <div className="relative">
-                          <button className="text-xl ml-2" onClick={(e) => e.stopPropagation()}>
+                          <button className="text-xl ml-2" onClick={(e) => { e.stopPropagation(); toggleIdeaMenu(`${cycleIndex}-${ideaIndex}`); }}>
                             &#x22EE;
                           </button>
-                          <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
-                            <button 
-                              onClick={() => { openEditIdeaModal(cycleIndex, ideaIndex); }} 
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                              Edit
-                            </button>
-                            <button 
-                              onClick={() => deleteIdea(cycleIndex, ideaIndex)} 
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                              Delete
-                            </button>
-                          </div>
+                          {openIdeaMenuIndex === `${cycleIndex}-${ideaIndex}` && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
+                              <button 
+                                onClick={() => { openEditIdeaModal(cycleIndex, ideaIndex); setOpenIdeaMenuIndex(null); }} 
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                Edit
+                              </button>
+                              <button 
+                                onClick={() => { deleteIdea(cycleIndex, ideaIndex); setOpenIdeaMenuIndex(null); }} 
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
