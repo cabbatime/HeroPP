@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useClickAway } from 'react-use';
 
 function App() {
   const [cycles, setCycles] = useState([]);
   const [newCycle, setNewCycle] = useState({ name: '', startDate: '', endDate: '', goal: '' });
   const [newIdea, setNewIdea] = useState({ title: '', description: '', cycleIndex: null });
+  const [newComment, setNewComment] = useState({ text: '', name: '' });
   const [expandedCycleIndex, setExpandedCycleIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditCycleModalOpen, setIsEditCycleModalOpen] = useState(false);
@@ -14,6 +16,16 @@ function App() {
   const [error, setError] = useState(null);
   const [openCycleMenuIndex, setOpenCycleMenuIndex] = useState(null);
   const [openIdeaMenuIndex, setOpenIdeaMenuIndex] = useState(null);
+  const cycleMenuRef = useRef(null);
+  const ideaMenuRef = useRef(null);
+
+  useClickAway(cycleMenuRef, () => {
+    setOpenCycleMenuIndex(null);
+  });
+
+  useClickAway(ideaMenuRef, () => {
+    setOpenIdeaMenuIndex(null);
+  });
 
   useEffect(() => {
     fetchData();
@@ -74,6 +86,17 @@ function App() {
       saveData({ cycles: updatedCycles });
       setCycles(updatedCycles);
       setNewIdea({ title: '', description: '', cycleIndex: null });
+    }
+  };
+
+  const addComment = (cycleIndex, ideaIndex) => {
+    if (newComment.text) {
+      const updatedCycles = [...cycles];
+      const comment = { text: newComment.text, name: newComment.name || 'Anonymous' };
+      updatedCycles[cycleIndex].ideas[ideaIndex].comments.push(comment);
+      saveData({ cycles: updatedCycles });
+      setCycles(updatedCycles);
+      setNewComment({ text: '', name: '' });
     }
   };
 
@@ -149,7 +172,7 @@ function App() {
   return (
     <div className="font-sans text-gray-900 min-h-screen flex flex-col">
       <header className="bg-white border-b border-gray-300 p-4 flex justify-between items-center shadow-md">
-        <span className="font-bold text-blue-600 text-lg">Cycle Management App</span>
+        <span className="font-bold text-blue-600 text-lg">Hero PP</span>
         <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500" onClick={() => setIsModalOpen(true)}>Create New Cycle</button>
       </header>
 
@@ -164,7 +187,7 @@ function App() {
                 <h3 className="font-semibold">{cycle.name}</h3>
                 <span>{cycle.startDate} - {cycle.endDate}</span>
                 <span>Goal: {cycle.goal}</span>
-                <div className="relative">
+                <div className="relative" ref={cycleMenuRef}>
                   <button className="text-xl" onClick={(e) => { e.stopPropagation(); toggleCycleMenu(cycleIndex); }}>
                     &#x22EE;
                   </button>
@@ -196,11 +219,38 @@ function App() {
                         <div className="flex-1">
                           <h5 className="font-semibold">{idea.title}</h5>
                           <p>{idea.description}</p>
+                          <div className="mt-2">
+                            <h6 className="font-semibold mb-1">Comments</h6>
+                            <ul className="mb-2">
+                              {idea.comments.map((comment, commentIndex) => (
+                                <li key={commentIndex} className="mb-1">
+                                  <span className="font-semibold">{comment.name}:</span> {comment.text}
+                                </li>
+                              ))}
+                            </ul>
+                            <div className="flex space-x-2">
+                              <input
+                                className="flex-1 p-1 border border-gray-300 rounded"
+                                placeholder="Your comment"
+                                value={newComment.text}
+                                onChange={(e) => setNewComment({ ...newComment, text: e.target.value })}
+                              />
+                              <input
+                                className="flex-1 p-1 border border-gray-300 rounded"
+                                placeholder="Your name (optional)"
+                                value={newComment.name}
+                                onChange={(e) => setNewComment({ ...newComment, name: e.target.value })}
+                              />
+                              <button className="bg-blue-600 text-white py-1 px-3 rounded hover:bg-blue-500" onClick={() => addComment(cycleIndex, ideaIndex)}>
+                                Add Comment
+                              </button>
+                            </div>
+                          </div>
                         </div>
                         <button className="bg-blue-600 text-white py-1 px-3 rounded hover:bg-blue-500" onClick={() => voteIdea(cycleIndex, ideaIndex)}>
                           Vote
                         </button>
-                        <div className="relative">
+                        <div className="relative" ref={ideaMenuRef}>
                           <button className="text-xl ml-2" onClick={(e) => { e.stopPropagation(); toggleIdeaMenu(`${cycleIndex}-${ideaIndex}`); }}>
                             &#x22EE;
                           </button>
