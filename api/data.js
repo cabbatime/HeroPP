@@ -10,19 +10,16 @@ export default async function handler(request, response) {
 
   if (request.method === 'POST') {
     try {
-      // Log the raw request body
       console.log('Raw request body:', request.body);
 
-      let cycles;
+      let cycles = [];
       if (typeof request.body === 'string') {
-        cycles = JSON.parse(request.body);
-      } else if (typeof request.body === 'object') {
-        cycles = request.body;
-      } else {
-        throw new Error('Invalid request body format');
+        const parsed = JSON.parse(request.body);
+        cycles = Array.isArray(parsed.cycles) ? parsed.cycles : [];
+      } else if (typeof request.body === 'object' && Array.isArray(request.body.cycles)) {
+        cycles = request.body.cycles;
       }
 
-      // Log the parsed cycles
       console.log('Parsed cycles:', cycles);
 
       const blob = await put('cycles.json', JSON.stringify(cycles), {
@@ -41,7 +38,7 @@ export default async function handler(request, response) {
       if (cyclesBlob) {
         const fetchResponse = await fetch(cyclesBlob.url);
         const cycles = await fetchResponse.json();
-        response.status(200).json(cycles);
+        response.status(200).json(Array.isArray(cycles) ? cycles : []);
       } else {
         response.status(200).json([]);
       }

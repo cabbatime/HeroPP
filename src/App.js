@@ -8,6 +8,7 @@ function App() {
   const [expandedCycleIndex, setExpandedCycleIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -22,10 +23,14 @@ function App() {
   const fetchData = async () => {
     try {
       const response = await fetch('/api/data');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
-      setCycles(data);
+      setCycles(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching data:', error);
+      setError('Failed to load data. Please try refreshing the page.');
     } finally {
       setIsLoading(false);
     }
@@ -47,13 +52,13 @@ function App() {
       console.log('Save result:', result);
     } catch (error) {
       console.error('Error saving data:', error);
+      setError('Failed to save data. Please try again.');
     }
   };
 
-
   const addCycle = () => {
     if (newCycle.name && newCycle.startDate && newCycle.endDate && newCycle.goal) {
-      setCycles([...cycles, { ...newCycle, ideas: [] }]);
+      setCycles(prevCycles => [...prevCycles, { ...newCycle, ideas: [] }]);
       setNewCycle({ name: '', startDate: '', endDate: '', goal: '' });
       setIsModalOpen(false);
     }
@@ -61,21 +66,29 @@ function App() {
 
   const addIdea = (cycleIndex) => {
     if (newIdea.title && newIdea.description) {
-      const updatedCycles = [...cycles];
-      updatedCycles[cycleIndex].ideas.push({ ...newIdea, votes: 0, comments: [] });
-      setCycles(updatedCycles);
+      setCycles(prevCycles => {
+        const updatedCycles = [...prevCycles];
+        updatedCycles[cycleIndex].ideas.push({ ...newIdea, votes: 0, comments: [] });
+        return updatedCycles;
+      });
       setNewIdea({ title: '', description: '' });
     }
   };
 
   const voteIdea = (cycleIndex, ideaIndex) => {
-    const updatedCycles = [...cycles];
-    updatedCycles[cycleIndex].ideas[ideaIndex].votes += 1;
-    setCycles(updatedCycles);
+    setCycles(prevCycles => {
+      const updatedCycles = [...prevCycles];
+      updatedCycles[cycleIndex].ideas[ideaIndex].votes += 1;
+      return updatedCycles;
+    });
   };
 
   if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
   }
 
   return (
