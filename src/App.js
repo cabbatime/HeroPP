@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './App.module.css';
 
 function App() {
@@ -7,6 +7,43 @@ function App() {
   const [newIdea, setNewIdea] = useState({ title: '', description: '' });
   const [expandedCycleIndex, setExpandedCycleIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading) {
+      saveData();
+    }
+  }, [cycles]);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch('/api/data');
+      const data = await response.json();
+      setCycles(data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const saveData = async () => {
+    try {
+      await fetch('/api/data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cycles }),
+      });
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  };
 
   const addCycle = () => {
     if (newCycle.name && newCycle.startDate && newCycle.endDate && newCycle.goal) {
@@ -30,6 +67,10 @@ function App() {
     updatedCycles[cycleIndex].ideas[ideaIndex].votes += 1;
     setCycles(updatedCycles);
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className={styles.app}>
