@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import styles from './App.module.css';
 
 function App() {
   const [cycles, setCycles] = useState([]);
@@ -101,84 +100,80 @@ function App() {
   }
 
   return (
-    <div className={styles.app}>
-      <header className={styles.header}>
-        <nav className={styles.nav}>
-          <span className={styles.logo}>Cycle Management App</span>
-          <button className={styles.newCycleButton} onClick={() => setIsModalOpen(true)}>Create New Cycle</button>
-        </nav>
+    <div className="font-sans text-gray-900 min-h-screen flex flex-col">
+      <header className="bg-white border-b border-gray-300 p-4 flex justify-between items-center">
+        <span className="font-bold text-blue-600">Cycle Management App</span>
+        <button className="bg-blue-600 text-white py-2 px-4 rounded" onClick={() => setIsModalOpen(true)}>Create New Cycle</button>
       </header>
 
-      <main className={styles.main}>
-        <div className={styles.cycleList}>
+      <main className="flex-1 p-6 bg-gray-100 flex">
+        <div className="flex-1 space-y-4">
           {cycles.map((cycle, cycleIndex) => (
-            <div key={cycle.name} className={styles.cycleCard}>
+            <div key={cycle.name} className="bg-white border border-gray-300 rounded">
               <div 
-                className={styles.cycleHeader} 
+                className="flex justify-between items-center p-4 cursor-pointer"
                 onClick={() => setExpandedCycleIndex(expandedCycleIndex === cycleIndex ? null : cycleIndex)}
               >
-                <h3>{cycle.name}</h3>
+                <h3 className="font-semibold">{cycle.name}</h3>
                 <span>{cycle.startDate} - {cycle.endDate}</span>
                 <span>Goal: {cycle.goal}</span>
-                <button className={styles.expandButton}>
-                  {expandedCycleIndex === cycleIndex ? '▲' : '▼'}
-                </button>
-                <button onClick={() => deleteCycle(cycleIndex)} className={styles.deleteButton}>Delete</button>
+                <button className="text-xl">&#x25BC;</button>
+                <button onClick={() => deleteCycle(cycleIndex)} className="text-red-600">Delete</button>
               </div>
               {expandedCycleIndex === cycleIndex && (
-                <div className={styles.cycleContent}>
-                  <h4>Ideas</h4>
-                  <div className={styles.ideaList}>
+                <div className="p-4 border-t border-gray-300">
+                  <h4 className="font-semibold mb-2">Ideas</h4>
+                  <div className="space-y-2">
                     {cycle.ideas.sort((a, b) => b.votes - a.votes).map((idea, ideaIndex) => (
-                      <div key={idea.title} className={styles.ideaCard}>
-                        <div className={styles.voteCount}>{idea.votes}</div>
-                        <div className={styles.ideaContent}>
-                          <h5>{idea.title}</h5>
+                      <div key={idea.title} className="flex items-center bg-gray-100 border border-gray-300 rounded p-2">
+                        <div className="text-lg font-bold text-gray-700 mr-4">{idea.votes}</div>
+                        <div className="flex-1">
+                          <h5 className="font-semibold">{idea.title}</h5>
                           <p>{idea.description}</p>
                         </div>
-                        <button className={styles.voteButton} onClick={() => voteIdea(cycleIndex, ideaIndex)}>
+                        <button className="bg-blue-600 text-white py-1 px-3 rounded" onClick={() => voteIdea(cycleIndex, ideaIndex)}>
                           Vote
                         </button>
-                        <button onClick={() => deleteIdea(cycleIndex, ideaIndex)} className={styles.deleteButton}>Delete</button>
+                        <button onClick={() => deleteIdea(cycleIndex, ideaIndex)} className="text-red-600 ml-2">Delete</button>
                       </div>
                     ))}
                   </div>
-                  <div className={styles.newIdeaForm}>
+                  <div className="mt-4 space-y-2">
                     <input
-                      className={styles.input}
+                      className="w-full p-2 border border-gray-300 rounded"
                       placeholder="Idea Title"
                       value={newIdea.title}
                       onChange={(e) => setNewIdea({ ...newIdea, title: e.target.value })}
                     />
                     <textarea
-                      className={styles.textarea}
+                      className="w-full p-2 border border-gray-300 rounded"
                       placeholder="Idea Description"
                       value={newIdea.description}
                       onChange={(e) => setNewIdea({ ...newIdea, description: e.target.value })}
                     />
-                    <button className={styles.submitButton} onClick={() => addIdea(cycleIndex)}>Add Idea</button>
+                    <button className="bg-blue-600 text-white py-2 px-4 rounded" onClick={() => addIdea(cycleIndex)}>Add Idea</button>
                   </div>
                 </div>
               )}
             </div>
           ))}
         </div>
-        <div className={styles.sidebar}>
-          <h3>Suggest an idea</h3>
+        <div className="w-64 bg-white border border-gray-300 rounded p-4 ml-4">
+          <h3 className="font-semibold mb-2">Suggest an idea</h3>
           <textarea
-            className={styles.input}
+            className="w-full p-2 border border-gray-300 rounded mb-2"
             placeholder="Write your suggestion here..."
             value={newIdea.description}
             onChange={(e) => setNewIdea({ ...newIdea, description: e.target.value })}
           />
           <input
-            className={styles.input}
+            className="w-full p-2 border border-gray-300 rounded mb-2"
             placeholder="Idea Title"
             value={newIdea.title}
             onChange={(e) => setNewIdea({ ...newIdea, title: e.target.value })}
           />
           <select
-            className={styles.input}
+            className="w-full p-2 border border-gray-300 rounded mb-2"
             value={newIdea.cycleIndex}
             onChange={(e) => setNewIdea({ ...newIdea, cycleIndex: e.target.value })}
           >
@@ -187,45 +182,45 @@ function App() {
               <option key={cycle.name} value={index}>{cycle.name}</option>
             ))}
           </select>
-          <button className={styles.submitButton} onClick={() => newIdea.cycleIndex !== null && addIdea(newIdea.cycleIndex)}>
+          <button className="bg-blue-600 text-white py-2 px-4 rounded w-full" onClick={() => newIdea.cycleIndex !== null && addIdea(newIdea.cycleIndex)}>
             Submit
           </button>
         </div>
       </main>
 
       {isModalOpen && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <h2>Create New Cycle</h2>
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded w-96">
+            <h2 className="text-xl font-semibold mb-4">Create New Cycle</h2>
             <input
-              className={styles.input}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
               placeholder="Cycle Name"
               value={newCycle.name}
               onChange={(e) => setNewCycle({ ...newCycle, name: e.target.value })}
             />
             <input
-              className={styles.input}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
               type="date"
               placeholder="Start Date"
               value={newCycle.startDate}
               onChange={(e) => setNewCycle({ ...newCycle, startDate: e.target.value })}
             />
             <input
-              className={styles.input}
+              className="w-full p-2 border border-gray-300 rounded mb-2"
               type="date"
               placeholder="End Date"
               value={newCycle.endDate}
               onChange={(e) => setNewCycle({ ...newCycle, endDate: e.target.value })}
             />
             <input
-              className={styles.input}
+              className="w-full p-2 border border-gray-300 rounded mb-4"
               placeholder="Cycle Goal"
               value={newCycle.goal}
               onChange={(e) => setNewCycle({ ...newCycle, goal: e.target.value })}
             />
-            <div className={styles.modalButtons}>
-              <button className={styles.submitButton} onClick={addCycle}>Add Cycle</button>
-              <button className={styles.cancelButton} onClick={() => setIsModalOpen(false)}>Cancel</button>
+            <div className="flex justify-between">
+              <button className="bg-blue-600 text-white py-2 px-4 rounded" onClick={addCycle}>Add Cycle</button>
+              <button className="bg-gray-300 text-gray-700 py-2 px-4 rounded" onClick={() => setIsModalOpen(false)}>Cancel</button>
             </div>
           </div>
         </div>
