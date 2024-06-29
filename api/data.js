@@ -33,7 +33,7 @@ export default async function handler(request, response) {
     }
   } else if (request.method === 'GET') {
     try {
-      const { data } = await get('cycles.json', { token });
+      const data = await get('cycles.json', { token });
       console.log('Retrieved cycles:', JSON.stringify(data, null, 2));
       response.status(200).json(data || []);
     } catch (error) {
