@@ -1,4 +1,4 @@
-import { put, list } from '@vercel/blob';
+import { get, put, list } from '@vercel/blob';
 
 export default async function handler(request, response) {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
@@ -30,17 +30,11 @@ export default async function handler(request, response) {
     }
   } else if (request.method === 'GET') {
     try {
-      const { blobs } = await list({ token });
-      const cyclesBlob = blobs.find(blob => blob.name === 'cycles.json');
-      if (cyclesBlob) {
-        const fetchResponse = await fetch(cyclesBlob.url);
-        const cycles = await fetchResponse.json();
-        console.log('Retrieved cycles:', JSON.stringify(cycles, null, 2));
-        response.status(200).json(cycles);
-      } else {
-        console.log('No cycles found, returning empty array');
-        response.status(200).json([]);
-      }
+      const { Blob } = require('@vercel/blob');
+      const client = new Blob({ token });
+      const { data } = await client.get('cycles.json');
+      console.log('Retrieved cycles:', JSON.stringify(data, null, 2));
+      response.status(200).json(data || []);
     } catch (error) {
       console.error('Error in GET handler:', error);
       response.status(500).json({ error: 'Failed to retrieve data' });
