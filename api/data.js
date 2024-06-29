@@ -13,7 +13,10 @@ export default async function handler(request, response) {
       console.log('Raw request body:', request.body);
 
       let cycles = [];
-      if (request.body && request.body.cycles && Array.isArray(request.body.cycles)) {
+      if (typeof request.body === 'string') {
+        const parsed = JSON.parse(request.body);
+        cycles = Array.isArray(parsed.cycles) ? parsed.cycles : [];
+      } else if (typeof request.body === 'object' && Array.isArray(request.body.cycles)) {
         cycles = request.body.cycles;
       }
 
