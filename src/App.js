@@ -164,26 +164,26 @@ function App() {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div className="flex items-center justify-center min-h-screen">Error: {error}</div>;
   }
 
   return (
-    <div className="font-sans text-gray-900 min-h-screen flex flex-col">
+    <div className="font-sans text-gray-900 min-h-screen flex flex-col bg-gray-100">
       <header className="bg-white border-b border-gray-300 p-4 flex justify-between items-center shadow-md">
         <span className="font-bold text-blue-600 text-lg">Hero PP</span>
         <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500" onClick={() => setIsModalOpen(true)}>Create New Cycle</button>
       </header>
 
-      <main className="flex-1 p-6 bg-gray-100 flex">
+      <main className="flex-1 p-6 flex">
         <div className="flex-1 space-y-4">
           {cycles.map((cycle, cycleIndex) => (
             <div key={cycle.name} className="bg-white border border-gray-300 rounded shadow-sm">
               <div 
-                className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50"
+                className="flex justify-between items-center p-4 cursor-pointer hover:bg-blue-50"
                 onClick={() => setExpandedCycleIndex(expandedCycleIndex === cycleIndex ? null : cycleIndex)}
               >
                 <h3 className="font-semibold">{cycle.name}</h3>
@@ -212,13 +212,13 @@ function App() {
                 </div>
               </div>
               {expandedCycleIndex === cycleIndex && (
-                <div className="p-4 border-t border-gray-300">
+                <div className="p-4 border-t border-gray-300 bg-blue-50">
                   <h4 className="font-semibold mb-2">Ideas</h4>
                   <div className="space-y-2">
                     {cycle.ideas.sort((a, b) => b.votes - a.votes).map((idea, ideaIndex) => (
                       <div key={idea.title} className="bg-white border border-gray-300 rounded shadow-sm">
                         <div 
-                          className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50"
+                          className="flex justify-between items-center p-4 cursor-pointer hover:bg-blue-50"
                           onClick={() => setExpandedIdeaIndex(expandedIdeaIndex === ideaIndex ? null : ideaIndex)}
                         >
                           <div className="text-lg font-bold text-gray-700 mr-4">{idea.votes}</div>
@@ -249,7 +249,7 @@ function App() {
                           </div>
                         </div>
                         {expandedIdeaIndex === ideaIndex && (
-                          <div className="p-4 border-t border-gray-300">
+                          <div className="p-4 border-t border-gray-300 bg-blue-50">
                             <h5 className="font-semibold mb-2">{idea.title}</h5>
                             <p>{idea.description}</p>
                             <div className="mt-4">
