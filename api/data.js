@@ -1,4 +1,4 @@
-import { put, list, del } from '@vercel/blob';
+import { put, list } from '@vercel/blob';
 
 export default async function handler(request, response) {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
@@ -37,6 +37,9 @@ export default async function handler(request, response) {
       const cyclesBlob = blobs.find(blob => blob.pathname === 'cycles.json');
       if (cyclesBlob) {
         const fetchResponse = await fetch(cyclesBlob.url);
+        if (!fetchResponse.ok) {
+          throw new Error(`Failed to fetch data: ${fetchResponse.status} ${fetchResponse.statusText}`);
+        }
         const cycles = await fetchResponse.json();
         console.log('Retrieved cycles:', JSON.stringify(cycles, null, 2));
         response.status(200).json(Array.isArray(cycles) ? cycles : []);
