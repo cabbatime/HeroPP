@@ -108,64 +108,49 @@ function App() {
 
   return (
     <div className="font-sans text-gray-900 min-h-screen flex flex-col">
-      <header className="bg-white border-b border-gray-300 p-4 flex justify-between items-center">
-        <span className="font-bold text-blue-600">Cycle Management App</span>
-        <button className="bg-blue-600 text-white py-2 px-4 rounded" onClick={() => setIsModalOpen(true)}>Create New Cycle</button>
+      <header className="bg-white border-b border-gray-300 p-4 flex justify-between items-center shadow-md">
+        <span className="font-bold text-blue-600 text-lg">Cycle Management App</span>
+        <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500" onClick={() => setIsModalOpen(true)}>Create New Cycle</button>
       </header>
 
       <main className="flex-1 p-6 bg-gray-100 flex">
         <div className="flex-1 space-y-4">
           {cycles.map((cycle, cycleIndex) => (
-            <div key={cycle.name} className="bg-white border border-gray-300 rounded">
+            <div key={cycle.name} className="bg-white border border-gray-300 rounded shadow-sm">
               <div 
-                className="flex justify-between items-center p-4 cursor-pointer"
+                className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50"
                 onClick={() => setExpandedCycleIndex(expandedCycleIndex === cycleIndex ? null : cycleIndex)}
               >
                 <h3 className="font-semibold">{cycle.name}</h3>
                 <span>{cycle.startDate} - {cycle.endDate}</span>
                 <span>Goal: {cycle.goal}</span>
                 <button className="text-xl">&#x25BC;</button>
-                <button onClick={() => deleteCycle(cycleIndex)} className="text-red-600">Delete</button>
+                <button onClick={() => deleteCycle(cycleIndex)} className="text-red-600 hover:text-red-400">Delete</button>
               </div>
               {expandedCycleIndex === cycleIndex && (
                 <div className="p-4 border-t border-gray-300">
                   <h4 className="font-semibold mb-2">Ideas</h4>
                   <div className="space-y-2">
                     {cycle.ideas.sort((a, b) => b.votes - a.votes).map((idea, ideaIndex) => (
-                      <div key={idea.title} className="flex items-center bg-gray-100 border border-gray-300 rounded p-2">
+                      <div key={idea.title} className="flex items-center bg-gray-100 border border-gray-300 rounded p-2 hover:shadow-md">
                         <div className="text-lg font-bold text-gray-700 mr-4">{idea.votes}</div>
                         <div className="flex-1">
                           <h5 className="font-semibold">{idea.title}</h5>
                           <p>{idea.description}</p>
                         </div>
-                        <button className="bg-blue-600 text-white py-1 px-3 rounded" onClick={() => voteIdea(cycleIndex, ideaIndex)}>
+                        <button className="bg-blue-600 text-white py-1 px-3 rounded hover:bg-blue-500" onClick={() => voteIdea(cycleIndex, ideaIndex)}>
                           Vote
                         </button>
-                        <button onClick={() => deleteIdea(cycleIndex, ideaIndex)} className="text-red-600 ml-2">Delete</button>
+                        <button onClick={() => deleteIdea(cycleIndex, ideaIndex)} className="text-red-600 hover:text-red-400 ml-2">Delete</button>
                       </div>
                     ))}
-                  </div>
-                  <div className="mt-4 space-y-2">
-                    <input
-                      className="w-full p-2 border border-gray-300 rounded"
-                      placeholder="Idea Title"
-                      value={newIdea.title}
-                      onChange={(e) => setNewIdea({ ...newIdea, title: e.target.value })}
-                    />
-                    <textarea
-                      className="w-full p-2 border border-gray-300 rounded"
-                      placeholder="Idea Description"
-                      value={newIdea.description}
-                      onChange={handleDescriptionChange}
-                    />
-                    <button className="bg-blue-600 text-white py-2 px-4 rounded" onClick={() => addIdea(cycleIndex)}>Add Idea</button>
                   </div>
                 </div>
               )}
             </div>
           ))}
         </div>
-        <div className="w-64 bg-white border border-gray-300 rounded p-4 ml-4">
+        <div className="w-64 bg-white border border-gray-300 rounded shadow-sm p-4 ml-4">
           <h3 className="font-semibold mb-2">Suggest an idea</h3>
           <input
             className="w-full p-2 border border-gray-300 rounded mb-2"
@@ -189,7 +174,7 @@ function App() {
               <option key={cycle.name} value={index}>{cycle.name}</option>
             ))}
           </select>
-          <button className="bg-blue-600 text-white py-2 px-4 rounded w-full" onClick={() => newIdea.cycleIndex !== null && addIdea(newIdea.cycleIndex)}>
+          <button className="bg-blue-600 text-white py-2 px-4 rounded w-full hover:bg-blue-500" onClick={() => newIdea.cycleIndex !== null && addIdea(newIdea.cycleIndex)}>
             Submit
           </button>
         </div>
@@ -197,7 +182,7 @@ function App() {
 
       {isModalOpen && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded w-96">
+          <div className="bg-white p-6 rounded shadow-lg w-96">
             <h2 className="text-xl font-semibold mb-4">Create New Cycle</h2>
             <input
               className="w-full p-2 border border-gray-300 rounded mb-2"
@@ -226,8 +211,8 @@ function App() {
               onChange={(e) => setNewCycle({ ...newCycle, goal: e.target.value })}
             />
             <div className="flex justify-between">
-              <button className="bg-blue-600 text-white py-2 px-4 rounded" onClick={addCycle}>Add Cycle</button>
-              <button className="bg-gray-300 text-gray-700 py-2 px-4 rounded" onClick={() => setIsModalOpen(false)}>Cancel</button>
+              <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500" onClick={addCycle}>Add Cycle</button>
+              <button className="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-200" onClick={() => setIsModalOpen(false)}>Cancel</button>
             </div>
           </div>
         </div>
