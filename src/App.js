@@ -22,23 +22,23 @@ function App() {
       }
       const data = await response.json();
       console.log('Fetched data:', data);
-      setCycles(Array.isArray(data) ? data : []);
-      setIsLoading(false); // Update isLoading state when data is fetched successfully
+      setCycles(data); // Set cycles directly from fetched data
     } catch (error) {
       console.error('Error fetching data:', error);
       setError('Failed to load data. Please try refreshing the page.');
-      setIsLoading(false); // Ensure isLoading is set to false on error
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const saveData = async () => {
+  const saveData = async (data) => {
     try {
       const response = await fetch('/api/data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ cycles }),
+        body: JSON.stringify(data),
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -53,32 +53,29 @@ function App() {
 
   const addCycle = () => {
     if (newCycle.name && newCycle.startDate && newCycle.endDate && newCycle.goal) {
-      setCycles(prevCycles => [...prevCycles, { ...newCycle, ideas: [] }]);
+      const updatedCycles = [...cycles, { ...newCycle, ideas: [] }];
+      saveData({ cycles: updatedCycles });
+      setCycles(updatedCycles);
       setNewCycle({ name: '', startDate: '', endDate: '', goal: '' });
       setIsModalOpen(false);
-      saveData(); // Call saveData after adding a new cycle
     }
   };
 
   const addIdea = (cycleIndex) => {
     if (newIdea.title && newIdea.description) {
-      setCycles(prevCycles => {
-        const updatedCycles = [...prevCycles];
-        updatedCycles[cycleIndex].ideas.push({ ...newIdea, votes: 0, comments: [] });
-        return updatedCycles;
-      });
+      const updatedCycles = [...cycles];
+      updatedCycles[cycleIndex].ideas.push({ ...newIdea, votes: 0, comments: [] });
+      saveData({ cycles: updatedCycles });
+      setCycles(updatedCycles);
       setNewIdea({ title: '', description: '' });
-      saveData(); // Call saveData after adding a new idea
     }
   };
 
   const voteIdea = (cycleIndex, ideaIndex) => {
-    setCycles(prevCycles => {
-      const updatedCycles = [...prevCycles];
-      updatedCycles[cycleIndex].ideas[ideaIndex].votes += 1;
-      return updatedCycles;
-    });
-    saveData(); // Call saveData after voting on an idea
+    const updatedCycles = [...cycles];
+    updatedCycles[cycleIndex].ideas[ideaIndex].votes += 1;
+    saveData({ cycles: updatedCycles });
+    setCycles(updatedCycles);
   };
 
   if (isLoading) {
