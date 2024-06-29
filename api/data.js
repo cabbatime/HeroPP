@@ -18,10 +18,14 @@ export default async function handler(request, response) {
         cycles = request.body.cycles;
       }
 
+      console.log('Parsed cycles:', JSON.stringify(cycles, null, 2));
+
       const blob = await put('cycles.json', JSON.stringify(cycles), {
         access: 'public',
         token: token
       });
+
+      console.log('Blob saved at URL:', blob.url);
       response.status(200).json({ message: 'Data saved', url: blob.url });
     } catch (error) {
       console.error('Error in POST handler:', error);
@@ -30,15 +34,21 @@ export default async function handler(request, response) {
   } else if (request.method === 'GET') {
     try {
       const { blobs } = await list({ token });
+      console.log('Blobs list:', blobs);
+
       const cyclesBlob = blobs.find(blob => blob.pathname === 'cycles.json');
       if (cyclesBlob) {
+        console.log('Cycles blob found:', cyclesBlob);
+
         const fetchResponse = await fetch(cyclesBlob.url);
         if (!fetchResponse.ok) {
           throw new Error(`Failed to fetch data: ${fetchResponse.status} ${fetchResponse.statusText}`);
         }
         const cycles = await fetchResponse.json();
+        console.log('Retrieved cycles:', JSON.stringify(cycles, null, 2));
         response.status(200).json(Array.isArray(cycles) ? cycles : []);
       } else {
+        console.log('No cycles found, returning empty array');
         response.status(200).json([]);
       }
     } catch (error) {
