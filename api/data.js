@@ -1,7 +1,7 @@
-import { put, list } from '@vercel/blob';
+import { put, list, del } from '@vercel/blob';
 
 export default async function handler(request, response) {
-  const token = process.env.REACT_APP_BLOB_READ_WRITE_TOKEN;
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
 
   if (!token) {
     console.error('Blob token is not set');
@@ -20,7 +20,7 @@ export default async function handler(request, response) {
         cycles = request.body.cycles;
       }
 
-      console.log('Parsed cycles:', cycles);
+      console.log('Parsed cycles:', JSON.stringify(cycles, null, 2));
 
       const blob = await put('cycles.json', JSON.stringify(cycles), {
         access: 'public',
@@ -38,8 +38,10 @@ export default async function handler(request, response) {
       if (cyclesBlob) {
         const fetchResponse = await fetch(cyclesBlob.url);
         const cycles = await fetchResponse.json();
+        console.log('Retrieved cycles:', JSON.stringify(cycles, null, 2));
         response.status(200).json(Array.isArray(cycles) ? cycles : []);
       } else {
+        console.log('No cycles found, returning empty array');
         response.status(200).json([]);
       }
     } catch (error) {

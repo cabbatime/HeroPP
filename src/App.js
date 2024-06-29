@@ -27,6 +27,7 @@ function App() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
+      console.log('Fetched data:', data);
       setCycles(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching data:', error);
