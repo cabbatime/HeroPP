@@ -7,6 +7,7 @@ function App() {
   const [newIdea, setNewIdea] = useState({ title: '', description: '', cycleIndex: null });
   const [newComment, setNewComment] = useState({ text: '', name: '' });
   const [expandedCycleIndex, setExpandedCycleIndex] = useState(null);
+  const [expandedIdeaIndex, setExpandedIdeaIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditCycleModalOpen, setIsEditCycleModalOpen] = useState(false);
   const [isEditIdeaModalOpen, setIsEditIdeaModalOpen] = useState(false);
@@ -16,6 +17,7 @@ function App() {
   const [error, setError] = useState(null);
   const [openCycleMenuIndex, setOpenCycleMenuIndex] = useState(null);
   const [openIdeaMenuIndex, setOpenIdeaMenuIndex] = useState(null);
+  const [showCommentInput, setShowCommentInput] = useState(null);
   const cycleMenuRef = useRef(null);
   const ideaMenuRef = useRef(null);
 
@@ -214,63 +216,82 @@ function App() {
                   <h4 className="font-semibold mb-2">Ideas</h4>
                   <div className="space-y-2">
                     {cycle.ideas.sort((a, b) => b.votes - a.votes).map((idea, ideaIndex) => (
-                      <div key={idea.title} className="flex items-center bg-gray-100 border border-gray-300 rounded p-2 hover:shadow-md">
-                        <div className="text-lg font-bold text-gray-700 mr-4">{idea.votes}</div>
-                        <div className="flex-1">
+                      <div key={idea.title} className="bg-white border border-gray-300 rounded shadow-sm">
+                        <div 
+                          className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50"
+                          onClick={() => setExpandedIdeaIndex(expandedIdeaIndex === ideaIndex ? null : ideaIndex)}
+                        >
+                          <div className="text-lg font-bold text-gray-700 mr-4">{idea.votes}</div>
                           <h5 className="font-semibold">{idea.title}</h5>
-                          <p>{idea.description}</p>
-                          <div className="mt-2">
-                            <h6 className="font-semibold mb-1">Comments</h6>
-                            <ul className="mb-2">
-                              {idea.comments.map((comment, commentIndex) => (
-                                <li key={commentIndex} className="mb-1">
-                                  <span className="font-semibold">{comment.name}:</span> {comment.text}
-                                </li>
-                              ))}
-                            </ul>
-                            <div className="flex space-x-2">
-                              <input
-                                className="flex-1 p-1 border border-gray-300 rounded"
-                                placeholder="Your comment"
-                                value={newComment.text}
-                                onChange={(e) => setNewComment({ ...newComment, text: e.target.value })}
-                              />
-                              <input
-                                className="flex-1 p-1 border border-gray-300 rounded"
-                                placeholder="Your name (optional)"
-                                value={newComment.name}
-                                onChange={(e) => setNewComment({ ...newComment, name: e.target.value })}
-                              />
-                              <button className="bg-blue-600 text-white py-1 px-3 rounded hover:bg-blue-500" onClick={() => addComment(cycleIndex, ideaIndex)}>
-                                Add Comment
-                              </button>
-                            </div>
+                          <button className="bg-blue-600 text-white py-1 px-3 rounded hover:bg-blue-500" onClick={(e) => { e.stopPropagation(); voteIdea(cycleIndex, ideaIndex); }}>
+                            Vote
+                          </button>
+                          <div className="relative" ref={ideaMenuRef}>
+                            <button className="text-xl ml-2" onClick={(e) => { e.stopPropagation(); toggleIdeaMenu(`${cycleIndex}-${ideaIndex}`); }}>
+                              &#x22EE;
+                            </button>
+                            {openIdeaMenuIndex === `${cycleIndex}-${ideaIndex}` && (
+                              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
+                                <button 
+                                  onClick={() => { openEditIdeaModal(cycleIndex, ideaIndex); setOpenIdeaMenuIndex(null); }} 
+                                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                >
+                                  Edit
+                                </button>
+                                <button 
+                                  onClick={() => { deleteIdea(cycleIndex, ideaIndex); setOpenIdeaMenuIndex(null); }} 
+                                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
-                        <button className="bg-blue-600 text-white py-1 px-3 rounded hover:bg-blue-500" onClick={() => voteIdea(cycleIndex, ideaIndex)}>
-                          Vote
-                        </button>
-                        <div className="relative" ref={ideaMenuRef}>
-                          <button className="text-xl ml-2" onClick={(e) => { e.stopPropagation(); toggleIdeaMenu(`${cycleIndex}-${ideaIndex}`); }}>
-                            &#x22EE;
-                          </button>
-                          {openIdeaMenuIndex === `${cycleIndex}-${ideaIndex}` && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
-                              <button 
-                                onClick={() => { openEditIdeaModal(cycleIndex, ideaIndex); setOpenIdeaMenuIndex(null); }} 
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                              >
-                                Edit
-                              </button>
-                              <button 
-                                onClick={() => { deleteIdea(cycleIndex, ideaIndex); setOpenIdeaMenuIndex(null); }} 
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                              >
-                                Delete
-                              </button>
+                        {expandedIdeaIndex === ideaIndex && (
+                          <div className="p-4 border-t border-gray-300">
+                            <h5 className="font-semibold mb-2">{idea.title}</h5>
+                            <p>{idea.description}</p>
+                            <div className="mt-4">
+                              <h6 className="font-semibold mb-2">Comments</h6>
+                              <ul className="mb-4 space-y-2">
+                                {idea.comments.map((comment, commentIndex) => (
+                                  <li key={commentIndex} className="bg-gray-100 border border-gray-300 rounded p-2">
+                                    <span className="font-semibold">{comment.name}:</span> {comment.text}
+                                  </li>
+                                ))}
+                              </ul>
+                              {showCommentInput === `${cycleIndex}-${ideaIndex}` ? (
+                                <div className="space-y-2">
+                                  <textarea
+                                    className="w-full p-2 border border-gray-300 rounded"
+                                    placeholder="Your comment"
+                                    value={newComment.text}
+                                    onChange={(e) => setNewComment({ ...newComment, text: e.target.value })}
+                                  />
+                                  <input
+                                    className="w-full p-2 border border-gray-300 rounded"
+                                    placeholder="Your name (optional)"
+                                    value={newComment.name}
+                                    onChange={(e) => setNewComment({ ...newComment, name: e.target.value })}
+                                  />
+                                  <div className="flex justify-end space-x-2">
+                                    <button className="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-200" onClick={() => setShowCommentInput(null)}>
+                                      Cancel
+                                    </button>
+                                    <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500" onClick={() => addComment(cycleIndex, ideaIndex)}>
+                                      Add Comment
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500" onClick={() => setShowCommentInput(`${cycleIndex}-${ideaIndex}`)}>
+                                  Add Comment
+                                </button>
+                              )}
                             </div>
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
