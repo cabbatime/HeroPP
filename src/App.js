@@ -14,12 +14,6 @@ function App() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (!isLoading) {
-      saveData();
-    }
-  }, [cycles]);
-
   const fetchData = async () => {
     try {
       const response = await fetch('/api/data');
@@ -29,11 +23,11 @@ function App() {
       const data = await response.json();
       console.log('Fetched data:', data);
       setCycles(Array.isArray(data) ? data : []);
+      setIsLoading(false); // Update isLoading state when data is fetched successfully
     } catch (error) {
       console.error('Error fetching data:', error);
       setError('Failed to load data. Please try refreshing the page.');
-    } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Ensure isLoading is set to false on error
     }
   };
 
@@ -62,6 +56,7 @@ function App() {
       setCycles(prevCycles => [...prevCycles, { ...newCycle, ideas: [] }]);
       setNewCycle({ name: '', startDate: '', endDate: '', goal: '' });
       setIsModalOpen(false);
+      saveData(); // Call saveData after adding a new cycle
     }
   };
 
@@ -73,6 +68,7 @@ function App() {
         return updatedCycles;
       });
       setNewIdea({ title: '', description: '' });
+      saveData(); // Call saveData after adding a new idea
     }
   };
 
@@ -82,6 +78,7 @@ function App() {
       updatedCycles[cycleIndex].ideas[ideaIndex].votes += 1;
       return updatedCycles;
     });
+    saveData(); // Call saveData after voting on an idea
   };
 
   if (isLoading) {
