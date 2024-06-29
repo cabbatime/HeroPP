@@ -10,8 +10,6 @@ export default async function handler(request, response) {
 
   if (request.method === 'POST') {
     try {
-      console.log('Raw request body:', request.body);
-
       let cycles = [];
       if (typeof request.body === 'string') {
         const parsed = JSON.parse(request.body);
@@ -19,8 +17,6 @@ export default async function handler(request, response) {
       } else if (typeof request.body === 'object' && Array.isArray(request.body.cycles)) {
         cycles = request.body.cycles;
       }
-
-      console.log('Parsed cycles:', JSON.stringify(cycles, null, 2));
 
       const blob = await put('cycles.json', JSON.stringify(cycles), {
         access: 'public',
@@ -41,10 +37,8 @@ export default async function handler(request, response) {
           throw new Error(`Failed to fetch data: ${fetchResponse.status} ${fetchResponse.statusText}`);
         }
         const cycles = await fetchResponse.json();
-        console.log('Retrieved cycles:', JSON.stringify(cycles, null, 2));
         response.status(200).json(Array.isArray(cycles) ? cycles : []);
       } else {
-        console.log('No cycles found, returning empty array');
         response.status(200).json([]);
       }
     } catch (error) {
