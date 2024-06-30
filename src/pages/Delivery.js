@@ -8,6 +8,12 @@ function Delivery() {
     readyForDev: [],
     inProgress: [],
   });
+  const [selectedCycle, setSelectedCycle] = useState('');
+  const [filteredTasks, setFilteredTasks] = useState({
+    planning: [],
+    readyForDev: [],
+    inProgress: [],
+  });
   const [selectedIdea, setSelectedIdea] = useState(null);
   const [isIdeaModalOpen, setIsIdeaModalOpen] = useState(false);
   const [newComment, setNewComment] = useState({ text: '', name: '' });
@@ -16,6 +22,18 @@ function Delivery() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (selectedCycle) {
+      setFilteredTasks({
+        planning: tasks.planning.filter(task => task.cycleName === selectedCycle),
+        readyForDev: tasks.readyForDev.filter(task => task.cycleName === selectedCycle),
+        inProgress: tasks.inProgress.filter(task => task.cycleName === selectedCycle),
+      });
+    } else {
+      setFilteredTasks(tasks);
+    }
+  }, [selectedCycle, tasks]);
 
   const fetchData = async () => {
     try {
@@ -40,6 +58,7 @@ function Delivery() {
 
       setCycles(data);
       setTasks(deliveryTasks);
+      setFilteredTasks(deliveryTasks);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -150,9 +169,19 @@ function Delivery() {
   return (
     <div className="flex flex-col items-center space-y-4 p-4">
       <h2 className="text-2xl font-semibold">Delivery</h2>
+      <select
+        className="p-2 border border-gray-600 rounded bg-gray-800 text-white mb-4"
+        value={selectedCycle}
+        onChange={(e) => setSelectedCycle(e.target.value)}
+      >
+        <option value="">All Cycles</option>
+        {cycles.map((cycle) => (
+          <option key={cycle.name} value={cycle.name}>{cycle.name}</option>
+        ))}
+      </select>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="flex space-x-4">
-          {Object.keys(tasks).map((column) => (
+          {Object.keys(filteredTasks).map((column) => (
             <div key={column} className="w-64">
               <h3 className="font-semibold mb-2">{column.replace(/([A-Z])/g, ' $1')}</h3>
               <Droppable droppableId={column}>
@@ -162,7 +191,7 @@ function Delivery() {
                     ref={provided.innerRef}
                     className="bg-gray-800 border border-gray-700 rounded shadow-sm p-4"
                   >
-                    {tasks[column].map((task, index) => (
+                    {filteredTasks[column].map((task, index) => (
                       <Draggable key={task.title} draggableId={task.title} index={index}>
                         {(provided) => (
                           <div
@@ -182,6 +211,13 @@ function Delivery() {
                                   'bg-green-500'
                                 }`}>
                                   {task.status}
+                                </span>
+                                <span className={`inline-block px-2 py-1 text-xs font-semibold rounded ml-2 ${
+                                  task.cycleName === 'Cycle 1' ? 'bg-blue-500' :
+                                  task.cycleName === 'Cycle 2' ? 'bg-green-500' :
+                                  'bg-red-500'
+                                }`}>
+                                  {task.cycleName}
                                 </span>
                               </div>
                               <div className="flex flex-col items-center text-gray-400 border border-gray-600 p-2 rounded">
