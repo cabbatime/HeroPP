@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Cycles from './pages/Cycles';
 import Delivery from './pages/Delivery';
 import Roadmap from './pages/Roadmap';
@@ -20,13 +20,13 @@ function App() {
         </header>
 
         <main className="flex-1 p-6">
-          <Switch>
-            <Route path="/cycles" component={Cycles} />
-            <Route path="/delivery" component={Delivery} />
-            <Route path="/roadmap" component={Roadmap} />
-            <Route path="/changelog" component={Changelog} />
-            <Route path="/" exact component={Cycles} />
-          </Switch>
+          <Routes>
+            <Route path="/cycles" element={<Cycles />} />
+            <Route path="/delivery" element={<Delivery />} />
+            <Route path="/roadmap" element={<Roadmap />} />
+            <Route path="/changelog" element={<Changelog />} />
+            <Route path="/" element={<Cycles />} />
+          </Routes>
         </main>
       </div>
     </Router>
