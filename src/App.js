@@ -183,24 +183,28 @@ function App() {
   return (
     <div className="font-sans text-gray-900 min-h-screen flex flex-col bg-gray-800 text-white">
       <header className="bg-gray-900 border-b border-gray-700 p-4 flex justify-between items-center shadow-md">
-        <span className="font-bold text-blue-400 text-lg">Hero PP</span>
-        <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500" onClick={() => setIsModalOpen(true)}>Create New Cycle</button>
+        <span className="font-bold text-blue-400 text-lg">Your App</span>
       </header>
 
       <main className="flex-1 p-6 flex space-x-6">
-        <div className="w-1/4 bg-gray-900 border border-gray-700 rounded shadow-sm p-4">
-          <h3 className="font-semibold mb-4">Cycles</h3>
-          <ul className="space-y-2">
-            {cycles.map((cycle, index) => (
-              <li
-                key={cycle.name}
-                className={`cursor-pointer p-2 rounded ${selectedCycleIndex === index ? 'bg-blue-700' : 'hover:bg-gray-700'}`}
-                onClick={() => handleCycleSelect(index)}
-              >
-                {cycle.name}
-              </li>
-            ))}
-          </ul>
+        <div className="w-1/4 bg-gray-900 border border-gray-700 rounded shadow-sm p-4 flex flex-col justify-between">
+          <div>
+            <h3 className="font-semibold mb-4">Cycles</h3>
+            <ul className="space-y-2">
+              {cycles.map((cycle, index) => (
+                <li
+                  key={cycle.name}
+                  className={`cursor-pointer p-2 rounded ${selectedCycleIndex === index ? 'bg-blue-700' : 'hover:bg-gray-700'}`}
+                  onClick={() => handleCycleSelect(index)}
+                >
+                  {cycle.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <button className="bg-blue-600 text-white py-2 px-4 rounded mt-4 hover:bg-blue-500" onClick={() => setIsModalOpen(true)}>
+            Create New Cycle
+          </button>
         </div>
 
         <div className="flex-1 space-y-4">
@@ -247,12 +251,15 @@ function App() {
                   {selectedCycle.ideas.sort((a, b) => b.votes - a.votes).map((idea, ideaIndex) => (
                     <div key={idea.title} className="bg-gray-800 border border-gray-700 rounded shadow-sm p-4 relative">
                       <div 
-                        className="flex justify-between items-center cursor-pointer"
+                        className="flex justify-between items-center cursor-pointer group"
                         onClick={() => setExpandedIdeaIndex(expandedIdeaIndex === ideaIndex ? null : ideaIndex)}
                       >
                         <div className="flex items-center">
-                          <div className="flex flex-col items-center text-gray-400 border border-gray-600 p-2 rounded mr-4">
-                            <button className="text-xl" onClick={(e) => { e.stopPropagation(); voteIdea(selectedCycleIndex, ideaIndex); }}>
+                          <div className="flex flex-col items-center text-gray-400 border border-gray-600 p-2 rounded mr-4 group-hover:border-white">
+                            <button 
+                              className="text-xl group-hover:text-white" 
+                              onClick={(e) => { e.stopPropagation(); voteIdea(selectedCycleIndex, ideaIndex); }}
+                            >
                               &#x25B2;
                             </button>
                             <div className="text-lg font-bold">{idea.votes}</div>
@@ -284,7 +291,7 @@ function App() {
                           )}
                         </div>
                       </div>
-                      <div className="absolute bottom-0 left-0 w-full h-1 bg-transparent hover:bg-white transition-all duration-300"></div>
+                      <div className="absolute bottom-0 left-0 w-full h-1 bg-transparent group-hover:bg-white transition-all duration-300"></div>
                       {expandedIdeaIndex === ideaIndex && (
                         <div className="p-4 border-t border-gray-700 bg-gray-700 mt-2 rounded">
                           <h5 className="font-semibold mb-2">{idea.title}</h5>
