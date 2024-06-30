@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function Cycles() {
   const [cycles, setCycles] = useState([]);
@@ -142,6 +142,22 @@ function Cycles() {
     setCycles(updatedCycles);
     setNewComment({ text: '', name: '' });
     setSelectedIdea(updatedIdea);
+  };
+
+  const saveIdeaDetails = () => {
+    const updatedCycles = cycles.map(cycle =>
+      cycle.name === selectedIdea.cycleName
+        ? {
+            ...cycle,
+            ideas: cycle.ideas.map(idea =>
+              idea.title === selectedIdea.title ? selectedIdea : idea
+            ),
+          }
+        : cycle
+    );
+    saveData({ cycles: updatedCycles });
+    setCycles(updatedCycles);
+    setIsIdeaModalOpen(false);
   };
 
   return (
