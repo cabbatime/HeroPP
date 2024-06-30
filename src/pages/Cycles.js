@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 function Cycles() {
   const [cycles, setCycles] = useState([]);
@@ -6,10 +6,12 @@ function Cycles() {
   const [newIdea, setNewIdea] = useState({ title: '', description: '' });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedIdea, setSelectedIdea] = useState(null);
+  const [isIdeaModalOpen, setIsIdeaModalOpen] = useState(false);
   const [isEditCycleModalOpen, setIsEditCycleModalOpen] = useState(false);
   const [cycleToEdit, setCycleToEdit] = useState(null);
   const [isEditIdeaModalOpen, setIsEditIdeaModalOpen] = useState(false);
   const [ideaToEdit, setIdeaToEdit] = useState(null);
+  const [newComment, setNewComment] = useState({ text: '', name: '' });
   const [showCommentInput, setShowCommentInput] = useState('');
 
   useEffect(() => {
@@ -119,6 +121,27 @@ function Cycles() {
   const closeIdeaModal = () => {
     setSelectedIdea(null);
     setIsIdeaModalOpen(false);
+  };
+
+  const addComment = () => {
+    const updatedIdea = {
+      ...selectedIdea,
+      comments: [...selectedIdea.comments, newComment]
+    };
+    const updatedCycles = cycles.map(cycle =>
+      cycle.name === updatedIdea.cycleName
+        ? {
+            ...cycle,
+            ideas: cycle.ideas.map(idea =>
+              idea.title === updatedIdea.title ? updatedIdea : idea
+            ),
+          }
+        : cycle
+    );
+    saveData({ cycles: updatedCycles });
+    setCycles(updatedCycles);
+    setNewComment({ text: '', name: '' });
+    setSelectedIdea(updatedIdea);
   };
 
   return (
