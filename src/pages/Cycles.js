@@ -5,7 +5,7 @@ function Cycles() {
   const [cycles, setCycles] = useState([]);
   const [selectedCycleIndex, setSelectedCycleIndex] = useState(null);
   const [newCycle, setNewCycle] = useState({ name: '', startDate: '', endDate: '', goal: '' });
-  const [newIdea, setNewIdea] = useState({ title: '', description: '', cycleIndex: null });
+  const [newIdea, setNewIdea] = useState({ title: '', description: '', cycleIndex: null, status: 'Idea' });
   const [newComment, setNewComment] = useState({ text: '', name: '' });
   const [expandedIdeaIndex, setExpandedIdeaIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -96,7 +96,7 @@ function Cycles() {
       updatedCycles[cycleIndex].ideas.push({ ...newIdea, votes: 0, comments: [] });
       saveData({ cycles: updatedCycles });
       setCycles(updatedCycles);
-      setNewIdea({ title: '', description: '', cycleIndex: null });
+      setNewIdea({ title: '', description: '', cycleIndex: null, status: 'Idea' });
       setIsIdeaModalOpen(false);
     }
   };
@@ -183,6 +183,17 @@ function Cycles() {
     setIsIdeaModalOpen(true);
   };
 
+  const updateIdeaStatus = (status) => {
+    if (selectedIdea) {
+      const updatedCycles = [...cycles];
+      const ideaIndex = cycles[selectedIdea.cycleIndex].ideas.indexOf(selectedIdea);
+      updatedCycles[selectedIdea.cycleIndex].ideas[ideaIndex].status = status;
+      saveData({ cycles: updatedCycles });
+      setCycles(updatedCycles);
+      setSelectedIdea({ ...selectedIdea, status });
+    }
+  };
+
   if (isLoading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
@@ -266,6 +277,9 @@ function Cycles() {
                       <div className="text-gray-300">
                         <h5 className="font-semibold">{idea.title}</h5>
                         <p className="text-sm">{idea.description}</p>
+                        <span className={`inline-block px-2 py-1 text-xs font-semibold rounded ${idea.status === 'Idea' ? 'bg-blue-500' : 'bg-green-500'}`}>
+                          {idea.status}
+                        </span>
                       </div>
                       <div className="flex flex-col items-center text-gray-400 border border-gray-600 p-2 rounded">
                         <button 
@@ -339,6 +353,17 @@ function Cycles() {
               </div>
             </div>
             <p className="mb-4">{selectedIdea.description}</p>
+            <div className="mb-4">
+              <label className="font-semibold">Status:</label>
+              <select
+                className="ml-2 p-2 border border-gray-600 rounded bg-gray-800 text-white"
+                value={selectedIdea.status}
+                onChange={(e) => updateIdeaStatus(e.target.value)}
+              >
+                <option value="Idea">Idea</option>
+                <option value="Delivery">Delivery</option>
+              </select>
+            </div>
             <div className="mt-4">
               <h6 className="font-semibold mb-2">Comments</h6>
               <ul className="mb-4 space-y-2">
