@@ -249,15 +249,15 @@ function App() {
                 <h4 className="font-semibold mb-2">Ideas</h4>
                 <div className="space-y-2">
                   {selectedCycle.ideas.sort((a, b) => b.votes - a.votes).map((idea, ideaIndex) => (
-                    <div key={idea.title} className="bg-gray-800 border border-gray-700 rounded shadow-sm p-4 relative">
+                    <div key={idea.title} className="bg-gray-800 border border-gray-700 rounded shadow-sm p-4 relative group">
                       <div 
-                        className="flex justify-between items-center cursor-pointer group"
+                        className="flex justify-between items-center cursor-pointer"
                         onClick={() => setExpandedIdeaIndex(expandedIdeaIndex === ideaIndex ? null : ideaIndex)}
                       >
                         <div className="flex items-center">
-                          <div className="flex flex-col items-center text-gray-400 border border-gray-600 p-2 rounded mr-4 group-hover:border-white">
+                          <div className="flex flex-col items-center text-gray-400 border border-gray-600 p-2 rounded mr-4">
                             <button 
-                              className="text-xl group-hover:text-white" 
+                              className="text-xl hover:text-white" 
                               onClick={(e) => { e.stopPropagation(); voteIdea(selectedCycleIndex, ideaIndex); }}
                             >
                               &#x25B2;
