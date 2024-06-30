@@ -62,7 +62,7 @@ function Cycles() {
   const addIdea = (cycleIndex) => {
     if (newIdea.title && newIdea.description) {
       const updatedCycles = [...cycles];
-      updatedCycles[cycleIndex].ideas.push({ ...newIdea, votes: 0, comments: [], status: 'Idea' });
+      updatedCycles[cycleIndex].ideas.push({ ...newIdea, votes: 0, comments: [], status: 'Idea', column: 'Planning' });
       saveData({ cycles: updatedCycles });
       setCycles(updatedCycles);
       setNewIdea({ title: '', description: '' });
@@ -167,113 +167,92 @@ function Cycles() {
       <div className="mt-4 flex">
         <aside className="w-1/4 pr-4">
           <h2 className="text-xl font-semibold mb-4">Cycles</h2>
-          <ul className="space-y-2">
-            <li>
-              <button
-                className={`w-full text-left p-2 rounded ${selectedCycle === 'All' ? 'bg-gray-700' : 'bg-gray-800'}`}
-                onClick={() => setSelectedCycle('All')}
-              >
-                All
-              </button>
+          <ul>
+            <li
+              className={`cursor-pointer mb-2 ${selectedCycle === 'All' ? 'text-blue-500' : 'text-gray-300'}`}
+              onClick={() => setSelectedCycle('All')}
+            >
+              All
             </li>
-            {cycles.map((cycle, index) => (
-              <li key={index}>
-                <button
-                  className={`w-full text-left p-2 rounded ${selectedCycle === cycle.name ? 'bg-gray-700' : 'bg-gray-800'}`}
-                  onClick={() => setSelectedCycle(cycle.name)}
-                >
-                  {cycle.name}
-                </button>
+            {cycles.map((cycle, cycleIndex) => (
+              <li
+                key={cycle.name}
+                className={`cursor-pointer mb-2 ${selectedCycle === cycle.name ? 'text-blue-500' : 'text-gray-300'}`}
+                onClick={() => setSelectedCycle(cycle.name)}
+              >
+                {cycle.name}
               </li>
             ))}
           </ul>
           <button
-            className="bg-blue-600 text-white py-2 px-4 rounded mt-4 hover:bg-blue-500"
+            className="mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500"
             onClick={() => setIsModalOpen(true)}
           >
             Create New Cycle
           </button>
         </aside>
-        <main className="w-3/4">
-          {cycles.filter(cycle => selectedCycle === 'All' || cycle.name === selectedCycle).map((cycle, cycleIndex) => (
-            <div key={cycleIndex} className="mb-8">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold">{cycle.name}</h2>
-                <div>
+        <main className="flex-1">
+          {cycles
+            .filter(cycle => selectedCycle === 'All' || cycle.name === selectedCycle)
+            .map((cycle, cycleIndex) => (
+              <div key={cycle.name} className="mb-8">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-semibold">{cycle.name}</h3>
                   <button
-                    className="bg-blue-600 text-white py-1 px-3 rounded hover:bg-blue-500"
-                    onClick={() => setShowCommentInput(cycleIndex)}
+                    className="text-gray-400 hover:text-white"
+                    onClick={() => editCycle(cycleIndex)}
                   >
-                    Add Idea
+                    ⋮
                   </button>
-                  {showCommentInput === cycleIndex && (
-                    <div className="bg-gray-800 p-4 rounded shadow-sm mt-2">
-                      <input
-                        className="w-full p-2 mb-2 border border-gray-600 rounded bg-gray-700 text-white"
-                        placeholder="Idea title"
-                        value={newIdea.title}
-                        onChange={(e) => setNewIdea({ ...newIdea, title: e.target.value })}
-                      />
-                      <textarea
-                        className="w-full p-2 mb-2 border border-gray-600 rounded bg-gray-700 text-white"
-                        placeholder="Idea description"
-                        value={newIdea.description}
-                        onChange={(e) => setNewIdea({ ...newIdea, description: e.target.value })}
-                      />
-                      <button
-                        className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500"
-                        onClick={() => addIdea(cycleIndex)}
-                      >
-                        Add Idea
-                      </button>
-                    </div>
-                  )}
                 </div>
-              </div>
-              <ul className="space-y-2 mt-4">
-                {cycle.ideas.map((idea, ideaIndex) => (
-                  <li key={ideaIndex} className="bg-gray-800 p-4 rounded shadow-sm cursor-pointer hover:bg-gray-700" onClick={() => openIdeaModal(idea)}>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <div className="flex flex-col items-center text-gray-400 border border-gray-600 p-2 rounded mr-4">
-                          <button
-                            className="text-xl hover:text-white"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              voteIdea(cycleIndex, ideaIndex);
-                            }}
-                          >
-                            ▲
-                          </button>
-                          <div className="text-lg font-bold">{idea.votes}</div>
+                <ul>
+                  {cycle.ideas.map((idea, ideaIndex) => (
+                    <li
+                      key={idea.title}
+                      className="bg-gray-700 p-4 mb-4 rounded shadow cursor-pointer hover:bg-gray-600"
+                      onClick={() => openIdeaModal(idea)}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center">
+                          <div className="flex flex-col items-center text-gray-400 border border-gray-600 p-2 rounded mr-4">
+                            <button
+                              className="text-xl hover:text-white"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                voteIdea(cycleIndex, ideaIndex);
+                              }}
+                            >
+                              ▲
+                            </button>
+                            <div className="text-lg font-bold">{idea.votes}</div>
+                          </div>
+                          <div className="text-gray-300">
+                            <h5 className="font-semibold">{idea.title}</h5>
+                            <p className="text-sm">{idea.description}</p>
+                            <span className={`inline-block px-2 py-1 text-xs font-semibold rounded ${
+                              cycle.name === 'Cycle 1' ? 'bg-blue-500' :
+                              cycle.name === 'Cycle 2' ? 'bg-green-500' :
+                              'bg-red-500'
+                            }`}>
+                              {cycle.name}
+                            </span>
+                          </div>
                         </div>
-                        <div className="text-gray-300">
-                          <h5 className="font-semibold">{idea.title}</h5>
-                          <p className="text-sm">{idea.description}</p>
-                          <span className={`inline-block px-2 py-1 text-xs font-semibold rounded ${
-                            cycle.name === 'Cycle 1' ? 'bg-blue-500' :
-                            cycle.name === 'Cycle 2' ? 'bg-green-500' :
-                            'bg-red-500'
-                          }`}>
-                            {cycle.name}
-                          </span>
-                        </div>
+                        <button
+                          className="text-gray-400 hover:text-white ml-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            editIdea(cycleIndex, ideaIndex);
+                          }}
+                        >
+                          ⋮
+                        </button>
                       </div>
-                      <button
-                        className="text-gray-400 hover:text-white ml-2"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          editIdea(cycleIndex, ideaIndex);
-                        }}
-                      >
-                        ⋮
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
         </main>
       </div>
 
