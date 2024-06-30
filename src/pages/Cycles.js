@@ -186,7 +186,9 @@ function Cycles() {
   const updateIdeaStatus = (status) => {
     if (selectedIdea) {
       const updatedCycles = [...cycles];
-      const ideaIndex = cycles[selectedIdea.cycleIndex].ideas.indexOf(selectedIdea);
+      const ideaIndex = updatedCycles[selectedIdea.cycleIndex].ideas.findIndex(
+        (idea) => idea.title === selectedIdea.title
+      );
       updatedCycles[selectedIdea.cycleIndex].ideas[ideaIndex].status = status;
       saveData({ cycles: updatedCycles });
       setCycles(updatedCycles);
