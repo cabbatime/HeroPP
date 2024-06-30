@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Route, Switch, Link, useHistory } from 'react-router-dom';
-import { useClickAway } from 'react-use';
-import Cycles from './Cycles';
-import Delivery from './Delivery';
-import Roadmap from './Roadmap';
-import Changelog from './Changelog';
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
+import Cycles from './pages/Cycles';
+import Delivery from './pages/Delivery';
+import Roadmap from './pages/Roadmap';
+import Changelog from './pages/Changelog';
 
 function App() {
   return (
