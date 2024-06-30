@@ -7,12 +7,11 @@ function Cycles() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedIdea, setSelectedIdea] = useState(null);
   const [isIdeaModalOpen, setIsIdeaModalOpen] = useState(false);
-  const [isEditCycleModalOpen, setIsEditCycleModalOpen] = useState(false);
   const [cycleToEdit, setCycleToEdit] = useState(null);
-  const [isEditIdeaModalOpen, setIsEditIdeaModalOpen] = useState(false);
   const [ideaToEdit, setIdeaToEdit] = useState(null);
   const [newComment, setNewComment] = useState({ text: '', name: '' });
   const [showCommentInput, setShowCommentInput] = useState('');
+  const [selectedCycle, setSelectedCycle] = useState('All');
 
   useEffect(() => {
     fetchData();
@@ -80,7 +79,7 @@ function Cycles() {
 
   const editCycle = (cycleIndex) => {
     setCycleToEdit(cycles[cycleIndex]);
-    setIsEditCycleModalOpen(true);
+    setIsModalOpen(true);
   };
 
   const saveEditedCycle = () => {
@@ -89,12 +88,12 @@ function Cycles() {
     );
     saveData({ cycles: updatedCycles });
     setCycles(updatedCycles);
-    setIsEditCycleModalOpen(false);
+    setIsModalOpen(false);
   };
 
   const editIdea = (cycleIndex, ideaIndex) => {
     setIdeaToEdit(cycles[cycleIndex].ideas[ideaIndex]);
-    setIsEditIdeaModalOpen(true);
+    setIsIdeaModalOpen(true);
   };
 
   const saveEditedIdea = () => {
@@ -110,7 +109,7 @@ function Cycles() {
     );
     saveData({ cycles: updatedCycles });
     setCycles(updatedCycles);
-    setIsEditIdeaModalOpen(false);
+    setIsIdeaModalOpen(false);
   };
 
   const openIdeaModal = (idea) => {
@@ -164,34 +163,39 @@ function Cycles() {
     <div className="p-4">
       <header className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-blue-600">Hero PP</h1>
-        <button
-          className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500"
-          onClick={() => setIsModalOpen(true)}
-        >
-          Create New Cycle
-        </button>
       </header>
       <div className="mt-4 flex">
         <aside className="w-1/4 pr-4">
           <h2 className="text-xl font-semibold mb-4">Cycles</h2>
           <ul className="space-y-2">
+            <li>
+              <button
+                className={`w-full text-left p-2 rounded ${selectedCycle === 'All' ? 'bg-gray-700' : 'bg-gray-800'}`}
+                onClick={() => setSelectedCycle('All')}
+              >
+                All
+              </button>
+            </li>
             {cycles.map((cycle, index) => (
-              <li key={index} className="bg-gray-800 p-2 rounded shadow-sm">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300">{cycle.name}</span>
-                  <button
-                    className="text-gray-400 hover:text-white"
-                    onClick={() => editCycle(index)}
-                  >
-                    ⋮
-                  </button>
-                </div>
+              <li key={index}>
+                <button
+                  className={`w-full text-left p-2 rounded ${selectedCycle === cycle.name ? 'bg-gray-700' : 'bg-gray-800'}`}
+                  onClick={() => setSelectedCycle(cycle.name)}
+                >
+                  {cycle.name}
+                </button>
               </li>
             ))}
           </ul>
+          <button
+            className="bg-blue-600 text-white py-2 px-4 rounded mt-4 hover:bg-blue-500"
+            onClick={() => setIsModalOpen(true)}
+          >
+            Create New Cycle
+          </button>
         </aside>
         <main className="w-3/4">
-          {cycles.map((cycle, cycleIndex) => (
+          {cycles.filter(cycle => selectedCycle === 'All' || cycle.name === selectedCycle).map((cycle, cycleIndex) => (
             <div key={cycleIndex} className="mb-8">
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-semibold">{cycle.name}</h2>
@@ -228,7 +232,7 @@ function Cycles() {
               </div>
               <ul className="space-y-2 mt-4">
                 {cycle.ideas.map((idea, ideaIndex) => (
-                  <li key={ideaIndex} className="bg-gray-800 p-4 rounded shadow-sm cursor-pointer" onClick={() => openIdeaModal(idea)}>
+                  <li key={ideaIndex} className="bg-gray-800 p-4 rounded shadow-sm cursor-pointer hover:bg-gray-700" onClick={() => openIdeaModal(idea)}>
                     <div className="flex justify-between items-center">
                       <div className="flex items-center">
                         <div className="flex flex-col items-center text-gray-400 border border-gray-600 p-2 rounded mr-4">
@@ -320,90 +324,10 @@ function Cycles() {
         </div>
       )}
 
-      {/* Edit Cycle Modal */}
-      {isEditCycleModalOpen && cycleToEdit && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-900 p-6 rounded shadow-lg w-full max-w-md border border-gray-700 relative">
-            <button
-              className="absolute top-4 right-4 text-gray-400 hover:text-white"
-              onClick={() => setIsEditCycleModalOpen(false)}
-            >
-              &times;
-            </button>
-            <h2 className="text-xl font-semibold mb-4">Edit Cycle</h2>
-            <input
-              className="w-full p-2 mb-2 border border-gray-600 rounded bg-gray-700 text-white"
-              placeholder="Cycle name"
-              value={cycleToEdit.name}
-              onChange={(e) => setCycleToEdit({ ...cycleToEdit, name: e.target.value })}
-            />
-            <input
-              className="w-full p-2 mb-2 border border-gray-600 rounded bg-gray-700 text-white"
-              placeholder="Start date"
-              type="date"
-              value={cycleToEdit.startDate}
-              onChange={(e) => setCycleToEdit({ ...cycleToEdit, startDate: e.target.value })}
-            />
-            <input
-              className="w-full p-2 mb-2 border border-gray-600 rounded bg-gray-700 text-white"
-              placeholder="End date"
-              type="date"
-              value={cycleToEdit.endDate}
-              onChange={(e) => setCycleToEdit({ ...cycleToEdit, endDate: e.target.value })}
-            />
-            <input
-              className="w-full p-2 mb-2 border border-gray-600 rounded bg-gray-700 text-white"
-              placeholder="Goal"
-              value={cycleToEdit.goal}
-              onChange={(e) => setCycleToEdit({ ...cycleToEdit, goal: e.target.value })}
-            />
-            <button
-              className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500"
-              onClick={saveEditedCycle}
-            >
-              Save Changes
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Idea Modal */}
-      {isEditIdeaModalOpen && ideaToEdit && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-900 p-6 rounded shadow-lg w-full max-w-md border border-gray-700 relative">
-            <button
-              className="absolute top-4 right-4 text-gray-400 hover:text-white"
-              onClick={() => setIsEditIdeaModalOpen(false)}
-            >
-              &times;
-            </button>
-            <h2 className="text-xl font-semibold mb-4">Edit Idea</h2>
-            <input
-              className="w-full p-2 mb-2 border border-gray-600 rounded bg-gray-700 text-white"
-              placeholder="Idea title"
-              value={ideaToEdit.title}
-              onChange={(e) => setIdeaToEdit({ ...ideaToEdit, title: e.target.value })}
-            />
-            <textarea
-              className="w-full p-2 mb-2 border border-gray-600 rounded bg-gray-700 text-white"
-              placeholder="Idea description"
-              value={ideaToEdit.description}
-              onChange={(e) => setIdeaToEdit({ ...ideaToEdit, description: e.target.value })}
-            />
-            <button
-              className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500"
-              onClick={saveEditedIdea}
-            >
-              Save Changes
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Idea Modal */}
       {isIdeaModalOpen && selectedIdea && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-900 p-6 rounded shadow-lg w-full max-w-4xl border border-gray-700 relative">
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={closeIdeaModal}>
+          <div className="bg-gray-900 p-6 rounded shadow-lg w-full max-w-4xl border border-gray-700 relative" onClick={(e) => e.stopPropagation()}>
             <button
               className="absolute top-4 right-4 text-gray-400 hover:text-white"
               onClick={closeIdeaModal}
@@ -432,7 +356,7 @@ function Cycles() {
                   <ul className="mb-4 space-y-2">
                     {selectedIdea.comments.map((comment, commentIndex) => (
                       <li key={commentIndex} className="bg-gray-600 border border-gray-700 rounded p-2">
-                        <span className="font-semibold">{comment.name}:</span> {comment.text}
+                        <span className="font-semibold">{comment.name || 'Anonymous'}:</span> {comment.text}
                       </li>
                     ))}
                   </ul>
